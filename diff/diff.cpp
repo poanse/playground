@@ -47,29 +47,6 @@ void DiffManager::PrintStep(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPr
   }
 }
 
-void DiffManager::PrintAddition(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
-  PrintHeadLine(oldIdxPrev-1, oldIdx, newIdxPrev, newIdx, 'a');
-  for (auto i=newIdxPrev; i < newIdx; ++i){
-    os << "> " << newLines[i] << '\n';
-  }
-}
-void DiffManager::PrintDeletion(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
-  PrintHeadLine(oldIdxPrev, oldIdx, newIdxPrev-1, newIdx, 'd');
-  for (auto i=oldIdxPrev; i < oldIdx; ++i){
-    os << "< " << oldLines[i] << '\n';
-  }
-}
-void DiffManager::PrintChange(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
-  PrintHeadLine(oldIdxPrev, oldIdx, newIdxPrev, newIdx, 'c');
-  for (auto i=oldIdxPrev; i < oldIdx; ++i){
-    os << "< " << oldLines[i] << '\n';
-  }
-  os << "---\n";
-  for (auto i=newIdxPrev; i < newIdx; ++i){
-    os << "> " << newLines[i] << '\n';
-  }
-}
-
 void DiffManager::PrintHeadLine(int oldIdxPrev, int idx, int newIdxPrev, int new_idx, char mode){
   os << (oldIdxPrev+1);
   if (oldIdxPrev+1 != idx) {
@@ -81,6 +58,28 @@ void DiffManager::PrintHeadLine(int oldIdxPrev, int idx, int newIdxPrev, int new
     os << ',' << new_idx;
   }
   os << '\n';
+}
+
+void PrintLines(ostream& os, std::vector<std::string> const& lines, int from, int to, char symbol) {
+  for (auto i=from; i<to; ++i){
+    os << symbol << " " << lines[i] << '\n';
+  }
+}
+
+
+void DiffManager::PrintAddition(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
+  PrintHeadLine(oldIdxPrev-1, oldIdx, newIdxPrev, newIdx, 'a');
+  PrintLines(os, newLines, newIdxPrev, newIdx, '>');
+}
+void DiffManager::PrintDeletion(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
+  PrintHeadLine(oldIdxPrev, oldIdx, newIdxPrev-1, newIdx, 'd');
+  PrintLines(os, oldLines, oldIdxPrev, oldIdx, '<');
+}
+void DiffManager::PrintChange(int oldIdx, int newIdx, int oldIdxPrev, int newIdxPrev) {
+  PrintHeadLine(oldIdxPrev, oldIdx, newIdxPrev, newIdx, 'c');
+  PrintLines(os, oldLines, oldIdxPrev, oldIdx, '<');
+  os << "---\n";
+  PrintLines(os, newLines, newIdxPrev, newIdx, '>');
 }
 
 vector<string> DiffManager::_ReadLines(istream& input) {
@@ -109,8 +108,8 @@ vector<vector<int>> DiffManager::LCS(vector<int> const& X, vector<int> const& Y)
   for (auto& row : C) {
     row.resize(n + 1);
   }
-  for (auto i = 0; i < m; ++i){
-    for (auto j = 0; j < n; ++j){
+  for (size_t i = 0; i < m; ++i){
+    for (size_t j = 0; j < n; ++j){
       if (X[i] == Y[j]) { //i-1 and j-1 if reading X & Y from zero
         C[i+1][j+1] = C[i][j] + 1;
       } else {
