@@ -16,12 +16,11 @@ TEST_CASE("All") {
     std::ifstream file_diff ("testfiles/test"+std::to_string(i)+"_diff.txt");
 
     std::string diff_output;
-    for (char ch; (ch = file_diff.get()) != EOF;) {
-      diff_output += ch;
-    }
+    std::getline(file_diff, diff_output, char(EOF));
+    
     std::stringstream stream;
-    DiffManager dm(file_old, file_new, stream);
-    dm.Print();
+    DiffManager dm(file_old, file_new);
+    dm.Print(stream);
     REQUIRE(stream.str() == diff_output);
   }
 }

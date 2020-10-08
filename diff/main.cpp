@@ -11,6 +11,6 @@ int main(int argc, char** argv) {
   }
   ifstream file_old (argv[1]);
   ifstream file_new (argv[2]);
-  DiffManager dm(file_old, file_new, cout);
-  dm.Print();
+  DiffManager dm(file_old, file_new);
+  dm.Print(cout);
 }
